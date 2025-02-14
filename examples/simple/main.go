@@ -9,7 +9,8 @@ import (
 )
 
 type formData struct {
-	Test int64 `schema:"test" validate:"gte=0,lte=100"`
+	Name  string `schema:"name" validate:"required" mod:"trim,sanitize"`
+	Value int64  `schema:"value" validate:"gte=0,lte=100"`
 }
 
 func main() {
