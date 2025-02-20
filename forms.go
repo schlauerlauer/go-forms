@@ -87,6 +87,5 @@ func (fp *FormProcessor) ProcessForm(dst interface{}, req *http.Request) error {
 		return ErrorValidating
 	}
 
-	slog.Debug("ProcessForm", "step", "done")
 	return nil
 }
