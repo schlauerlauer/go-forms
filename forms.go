@@ -14,14 +14,18 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 )
 
-type FormProcessor struct {
+type FormProcessor interface {
+	Process(dst any, req *http.Request) error
+}
+
+type formProcessorImpl struct {
 	decoder  *schema.Decoder
 	validate *validator.Validate
 	policy   *bluemonday.Policy
 	modifier *mold.Transformer
 }
 
-func NewFormProcessor() (*FormProcessor, error) {
+func NewFormProcessor() (FormProcessor, error) {
 	decoder := schema.NewDecoder()
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	policy := bluemonday.StrictPolicy()
@@ -40,7 +44,7 @@ func NewFormProcessorInitialized(
 	validate *validator.Validate,
 	policy *bluemonday.Policy,
 	modifier *mold.Transformer,
-) (*FormProcessor, error) {
+) (FormProcessor, error) {
 	if decoder == nil || validate == nil || policy == nil {
 		return nil, errors.New("FormProcessor dependencies not fulfilled")
 	}
@@ -53,7 +57,7 @@ func NewFormProcessorInitialized(
 		return nil
 	})
 
-	return &FormProcessor{
+	return &formProcessorImpl{
 		decoder:  decoder,
 		validate: validate,
 		policy:   policy,
@@ -62,14 +66,14 @@ func NewFormProcessorInitialized(
 }
 
 var (
-	ErrorParsing    = errors.New("Error parsing form")
-	ErrorDecoding   = errors.New("Error decoding form")
-	ErrorModifying  = errors.New("Error modifying form")
-	ErrorValidating = errors.New("Error validating form")
+	ErrorParsing    = errors.New("error parsing form")
+	ErrorDecoding   = errors.New("error decoding form")
+	ErrorModifying  = errors.New("error modifying form")
+	ErrorValidating = errors.New("error validating form")
 )
 
 // parses request form and mutates dst
-func (fp *FormProcessor) ProcessForm(dst interface{}, req *http.Request) error {
+func (fp *formProcessorImpl) Process(dst interface{}, req *http.Request) error {
 	if err := req.ParseForm(); err != nil {
 		slog.Error("ProcessForm", "step", "parse", "err", err)
 		return ErrorParsing

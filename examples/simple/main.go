@@ -23,11 +23,11 @@ func main() {
 
 	// setup routing
 	router := http.NewServeMux()
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
 
 		// process form data
 		var data formData
-		if err := formProcessor.ProcessForm(&data, r); err != nil {
+		if err := formProcessor.Process(&data, r); err != nil {
 			slog.Error("ProcessForm", "err", err.Error())
 			return
 		}

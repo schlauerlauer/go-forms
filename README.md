@@ -28,7 +28,7 @@ func main() {
 
     // setup routing
     router := http.NewServeMux()
-    router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+    router.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
 
         // process form data
         var data formData
